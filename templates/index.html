@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск курортных организаций</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏖️</text></svg>">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏖️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏖️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .organization-types-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .organization-types-section h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            max-width: 100%;
+        }
+        
+        .type-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        
+        .type-checkbox:hover {
+            border-color: #4facfe;
+            background: #f0f8ff;
+        }
+        
+        .type-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+            accent-color: #4facfe;
+        }
+        
+        .type-checkbox input[type="checkbox"]:checked + span {
+            font-weight: 600;
+            color: #2c5aa0;
+        }
+        
+        .type-checkbox span {
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(81, 207, 102, 0.3);
+        }
+
+        #stopBtn {
+            display: none;
+        }
+
+        #stopBtn:not(.hidden) {
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .completion-section {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border-bottom: 1px solid #d4edda;
+            text-align: center;
+        }
+
+        .completion-message {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #155724;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            border: 2px solid #c3e6cb;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .table-section {
+            padding: 30px;
+            max-height: 60vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: col-resize;
+            user-select: none;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        th.resizing {
+            background: linear-gradient(135deg, #4a5bc8 0%, #5a3180 100%);
+        }
+
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: transparent;
+            cursor: col-resize;
+            z-index: 20;
+        }
+
+        .resize-handle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .resize-handle.active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+
+        .status-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .hidden {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏖️ Поиск курортных организаций</h1>
+            <p>Найдите базы отдыха, гостиницы, санатории и другие организации размещения</p>
+        </div>
+
+        <div class="search-section">
+            <form class="search-form" id="searchForm">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="cityInput" 
+                    placeholder="Введите название города..."
+                    required
+                >
+                <button type="submit" class="btn btn-primary" id="searchBtn">
+                    🔍 Найти организации
+                </button>
+            </form>
+            
+            <div class="organization-types-section">
+                <h3>Типы организаций для поиска:</h3>
+                <div class="types-grid">
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_hotel" value="гостиница">
+                        <span>🏨 Гостиница</span>
+                    </label>
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_resort" value="база отдыха">
+                        <span>🏖️ База отдыха</span>
+                    </label>
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_sanatorium" value="санаторий">
+                        <span>🏥 Санаторий</span>
+                    </label>
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_guesthouse" value="гостевой дом">
+                        <span>🏠 Гостевой дом</span>
+                    </label>
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_hostel" value="хостел">
+                        <span>🛏️ Хостел</span>
+                    </label>
+                    <label class="type-checkbox">
+                        <input type="checkbox" id="type_recreation" value="дом отдыха">
+                        <span>🌲 Дом отдыха</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-section hidden" id="tableSection">
+            <div class="table-container">
+                <table id="organizationsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">
+                                Название организации
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 150px;">
+                                Координаты
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 120px;">
+                                ID организации
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 250px;">
+                                Полный адрес
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 200px;">
+                                Веб-сайт
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 200px;">
+                                E-mail
+                                <div class="resize-handle"></div>
+                            </th>
+                            <th style="width: 150px;">
+                                Тип организации
+                                <div class="resize-handle"></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="organizationsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Сообщение о завершении поиска -->
+        <div class="completion-section hidden" id="completionSection">
+            <div class="completion-message" id="completionMessage">
+                <!-- Сообщение будет добавлено динамически -->
+            </div>
+        </div>
+
+        <div class="controls-section hidden" id="controlsSection">
+            <div class="controls">
+                <button class="btn btn-secondary" id="searchNamesBtn">
+                    📋 Поиск организаций
+                </button>
+                <button class="btn btn-secondary" id="searchEmailsBtn">
+                    📧 Поиск email
+                </button>
+                <button class="btn btn-success" id="exportExcelBtn">
+                    📊 Экспорт в Excel
+                </button>
+                <button class="btn btn-danger" id="stopNamesBtn" style="display: none;">
+                    ⏹️ СТОП
+                </button>
+                <button class="btn btn-danger" id="stopEmailsBtn" style="display: none;">
+                    ⏹️ СТОП
+                </button>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <div id="statusMessages"></div>
+        </div>
+    </div>
+
+    <script>
+        class ResortSearchApp {
+            constructor() {
+                this.currentProcess = null;
+                this.organizations = [];
+                this.currentCity = '';
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+
+            initializeElements() {
+                this.searchForm = document.getElementById('searchForm');
+                this.cityInput = document.getElementById('cityInput');
+                this.searchBtn = document.getElementById('searchBtn');
+                this.controlsSection = document.getElementById('controlsSection');
+                this.tableSection = document.getElementById('tableSection');
+                this.completionSection = document.getElementById('completionSection');
+                this.completionMessage = document.getElementById('completionMessage');
+                this.organizationsTableBody = document.getElementById('organizationsTableBody');
+                this.statusMessages = document.getElementById('statusMessages');
+                
+                this.searchNamesBtn = document.getElementById('searchNamesBtn');
+                this.searchEmailsBtn = document.getElementById('searchEmailsBtn');
+                this.exportExcelBtn = document.getElementById('exportExcelBtn');
+                
+                // Две кнопки СТОП
+                this.stopNamesBtn = document.getElementById('stopNamesBtn');
+                this.stopEmailsBtn = document.getElementById('stopEmailsBtn');
+                
+                // Проверяем, что кнопки СТОП найдены
+                const stopButtons = [this.stopNamesBtn, this.stopEmailsBtn];
+                stopButtons.forEach((btn, index) => {
+                    if (!btn) {
+                        console.error(`❌ Кнопка СТОП ${index + 1} не найдена!`);
+                    } else {
+                        console.log(`✅ Кнопка СТОП ${index + 1} найдена и инициализирована`);
+                    }
+                });
+                
+                // Инициализируем изменение размера колонок
+                this.initializeColumnResizing();
+            }
+
+            attachEventListeners() {
+                this.searchForm.addEventListener('submit', (e) => this.handleSearch(e));
+                this.searchNamesBtn.addEventListener('click', () => this.startSearchNames());
+                this.searchEmailsBtn.addEventListener('click', () => this.startSearchEmails());
+                this.exportExcelBtn.addEventListener('click', () => this.exportToExcel());
+                
+                // Обработчики для кнопок СТОП
+                this.stopNamesBtn.addEventListener('click', () => this.stopProcess('search_names'));
+                this.stopEmailsBtn.addEventListener('click', () => this.stopProcess('search_emails'));
+            }
+
+            getSelectedOrganizationTypes() {
+                const checkboxes = document.querySelectorAll('.type-checkbox input[type="checkbox"]:checked');
+                return Array.from(checkboxes).map(cb => cb.value);
+            }
+
+            initializeColumnResizing() {
+                const table = document.getElementById('organizationsTable');
+                const headers = table.querySelectorAll('th');
+                
+                headers.forEach((header, index) => {
+                    const resizeHandle = header.querySelector('.resize-handle');
+                    
+                    let isResizing = false;
+                    let startX = 0;
+                    let startWidth = 0;
+                    
+                    resizeHandle.addEventListener('mousedown', (e) => {
+                        isResizing = true;
+                        startX = e.clientX;
+                        startWidth = header.offsetWidth;
+                        
+                        header.classList.add('resizing');
+                        resizeHandle.classList.add('active');
+                        
+                        document.body.style.cursor = 'col-resize';
+                        document.body.style.userSelect = 'none';
+                        
+                        e.preventDefault();
+                    });
+                    
+                    document.addEventListener('mousemove', (e) => {
+                        if (!isResizing) return;
+                        
+                        const diff = e.clientX - startX;
+                        const newWidth = startWidth + diff;
+                        
+                        // Минимальная ширина колонки
+                        if (newWidth >= 50) {
+                            header.style.width = newWidth + 'px';
+                        }
+                    });
+                    
+                    document.addEventListener('mouseup', () => {
+                        if (isResizing) {
+                            isResizing = false;
+                            header.classList.remove('resizing');
+                            resizeHandle.classList.remove('active');
+                            
+                            document.body.style.cursor = '';
+                            document.body.style.userSelect = '';
+                        }
+                    });
+                });
+            }
+
+            async handleSearch(e) {
+                e.preventDefault();
+                const city = this.cityInput.value.trim();
+                
+                if (!city) {
+                    this.showStatus('Введите название города', 'error');
+                    return;
+                }
+
+                // Собираем выбранные типы организаций
+                const selectedTypes = this.getSelectedOrganizationTypes();
+                if (selectedTypes.length === 0) {
+                    this.showStatus('Выберите хотя бы один тип организации', 'error');
+                    return;
+                }
+
+                // Сохраняем город и типы для последующих запросов
+                this.currentCity = city;
+                this.selectedTypes = selectedTypes;
+
+                this.showStatus(`Поиск организаций в городе: ${city} (типы: ${selectedTypes.join(', ')})`, 'info');
+                
+                // Устанавливаем активный процесс и отключаем все кнопки
+                this.currentProcess = 'search_names';
+                this.updateButtonStates();
+                
+                // Скрываем предыдущее сообщение о завершении
+                this.hideCompletionMessage();
+                
+                this.searchBtn.innerHTML = '<span class="loading"></span>Поиск...';
+
+                try {
+                    const response = await fetch('/api/search_organizations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            city: city,
+                            types: selectedTypes
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        this.showStatus(`Ошибка: ${data.error}`, 'error');
+                        // Сбрасываем активный процесс при ошибке
+                        this.currentProcess = null;
+                        this.updateButtonStates();
+                    } else {
+                        this.showStatus(data.message, 'success');
+                        // Показываем таблицу и кнопки управления
+                        this.controlsSection.classList.remove('hidden');
+                        this.tableSection.classList.remove('hidden');
+                        // Ждем завершения поиска и обновляем таблицу
+                        setTimeout(async () => {
+                            console.log('🔍 Начинаем обновление таблицы в handleSearch...');
+                            const count = await this.updateTable();
+                            console.log(`🔍 Получено count из updateTable: ${count}`);
+                            // Процесс завершен
+                            this.currentProcess = null;
+                            this.updateButtonStates();
+                            // Сообщение о завершении показывается внутри updateTable
+                            this.showStatus('Поиск организаций завершен', 'success');
+                        }, 2000);
+                    }
+                } catch (error) {
+                    this.showStatus(`Ошибка соединения: ${error.message}`, 'error');
+                } finally {
+                    // Сбрасываем активный процесс и включаем все кнопки
+                    this.currentProcess = null;
+                    this.updateButtonStates();
+                    this.searchBtn.innerHTML = '🔍 Найти организации';
+                }
+            }
+
+            async startSearchNames() {
+                if (!this.currentCity) {
+                    this.showStatus('Сначала введите город и нажмите "Найти организации"', 'error');
+                    return;
+                }
+
+                console.log(`🚀 Повторный поиск названий для города: ${this.currentCity}`);
+                this.currentProcess = 'search_names';
+                this.showStopButton('stopNamesBtn');
+                this.updateButtonStates();
+                
+                // Скрываем предыдущее сообщение о завершении
+                this.hideCompletionMessage();
+                this.showStatus(`Повторный поиск организаций в городе ${this.currentCity} (типы: ${this.selectedTypes.join(', ')}) запущен...`, 'info');
+                
+                try {
+                    console.log('Отправляем повторный запрос на поиск организаций...');
+                    const response = await fetch('/api/search_organizations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            city: this.currentCity,
+                            types: this.selectedTypes
+                        })
+                    });
+
+                    const data = await response.json();
+                    console.log('Ответ сервера:', data);
+                    
+                    if (data.error) {
+                        this.showStatus(`Ошибка: ${data.error}`, 'error');
+                        this.hideStopButton('stopNamesBtn');
+                        this.currentProcess = null;
+                        this.updateButtonStates();
+                    } else {
+                        this.showStatus(data.message, 'success');
+                        // Ждем завершения фонового потока
+                        setTimeout(async () => {
+                            console.log('🔍 Начинаем обновление таблицы в startSearchNames...');
+                            const count = await this.updateTable();
+                            console.log(`🔍 Получено count из updateTable: ${count}`);
+                            // Процесс завершен
+                            this.hideStopButton('stopNamesBtn');
+                            this.currentProcess = null;
+                            this.updateButtonStates();
+                            // Сообщение о завершении показывается внутри updateTable
+                            this.showStatus('Повторный поиск организаций завершен', 'success');
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Ошибка при повторном поиске названий:', error);
+                    this.showStatus(`Ошибка: ${error.message}`, 'error');
+                    this.hideStopButton('stopNamesBtn');
+                    this.currentProcess = null;
+                    this.updateButtonStates();
+                }
+            }
+
+            async startSearchEmails() {
+                if (this.organizations.length === 0) {
+                    this.showStatus('Сначала найдите организации', 'error');
+                    return;
+                }
+
+                console.log('🚀 Запуск поиска email адресов');
+                this.currentProcess = 'search_emails';
+                this.showStopButton('stopEmailsBtn');
+                this.updateButtonStates();
+                this.showStatus('Поиск email адресов запущен...', 'info');
+                
+                try {
+                    const response = await fetch('/api/search_emails', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        this.showStatus(`Ошибка: ${data.error}`, 'error');
+                        this.hideStopButton('stopEmailsBtn');
+                        this.currentProcess = null;
+                        this.updateButtonStates();
+                    } else {
+                        this.showStatus(data.message, 'success');
+                        // Обновляем таблицу
+                        const count = await this.updateTable();
+                        // Процесс завершен
+                        this.hideStopButton('stopEmailsBtn');
+                        this.currentProcess = null;
+                        this.updateButtonStates();
+                        this.showStatus('Поиск email завершен', 'success');
+                    }
+                } catch (error) {
+                    this.showStatus(`Ошибка: ${error.message}`, 'error');
+                    this.hideStopButton('stopEmailsBtn');
+                    this.currentProcess = null;
+                    this.updateButtonStates();
+                }
+            }
+
+
+            showStopButton(buttonId) {
+                // Скрываем все кнопки СТОП
+                this.hideAllStopButtons();
+                // Показываем нужную кнопку СТОП
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.style.display = 'inline-block';
+                    button.disabled = false;
+                    console.log(`✅ Показана кнопка СТОП: ${buttonId}`);
+                }
+            }
+
+            hideStopButton(buttonId) {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.style.display = 'none';
+                    console.log(`❌ Скрыта кнопка СТОП: ${buttonId}`);
+                }
+            }
+
+            hideAllStopButtons() {
+                const stopButtons = ['stopNamesBtn', 'stopEmailsBtn'];
+                stopButtons.forEach(buttonId => {
+                    this.hideStopButton(buttonId);
+                });
+            }
+
+            async stopProcess(processType) {
+                console.log(`🛑 Останавливаем процесс: ${processType}`);
+                
+                try {
+                    const response = await fetch('/api/stop_process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ process_type: processType })
+                    });
+
+                    const data = await response.json();
+                    console.log('Ответ сервера на остановку:', data);
+                    
+                    this.showStatus(data.message, 'warning');
+                    this.hideAllStopButtons();
+                    this.currentProcess = null;
+                    console.log('✅ Процесс остановлен:', processType);
+                } catch (error) {
+                    console.error('❌ Ошибка при остановке процесса:', error);
+                    this.showStatus(`Ошибка остановки: ${error.message}`, 'error');
+                    this.hideAllStopButtons();
+                    this.currentProcess = null;
+                }
+            }
+
+            updateButtonStates() {
+                // Все кнопки, которые должны быть отключены во время поиска
+                const buttonsToDisable = [
+                    this.searchBtn,           // Кнопка "Найти организации"
+                    this.searchNamesBtn,       // Кнопка "Поиск организаций"
+                    this.searchEmailsBtn,      // Кнопка "Поиск E-mail"
+                    this.exportExcelBtn        // Кнопка "Экспорт в Excel"
+                ];
+                
+                console.log('🔄 Обновляем состояние кнопок, текущий процесс:', this.currentProcess);
+                
+                if (this.currentProcess) {
+                    // Во время поиска отключаем все кнопки, кроме СТОП
+                    buttonsToDisable.forEach(btn => {
+                        if (btn) btn.disabled = true;
+                    });
+                    console.log('✅ Все кнопки отключены (кроме СТОП)');
+                } else {
+                    // Когда поиск завершен, включаем все кнопки
+                    buttonsToDisable.forEach(btn => {
+                        if (btn) btn.disabled = false;
+                    });
+                    this.hideAllStopButtons();
+                    console.log('✅ Все кнопки включены, все кнопки СТОП скрыты');
+                }
+            }
+
+
+            async updateTable(retryCount = 0) {
+                try {
+                    console.log(`🔄 Обновляем таблицу... (попытка ${retryCount + 1})`);
+                    const response = await fetch('/api/get_organizations');
+                    const data = await response.json();
+                    
+                    console.log('📊 Получены данные:', data);
+                    this.organizations = data.organizations;
+                    console.log(`📋 Найдено ${this.organizations.length} организаций`);
+                    
+                    // Если данных нет и это не последняя попытка, ждем и пробуем снова
+                    if (this.organizations.length === 0 && retryCount < 3) {
+                        console.log(`⏳ Данных нет, ждем 2 секунды и пробуем снова... (попытка ${retryCount + 1}/4)`);
+                        setTimeout(() => {
+                            this.updateTable(retryCount + 1);
+                        }, 2000);
+                        return 0; // Возвращаем 0 при повторной попытке (не вызываем showCompletionMessage)
+                    }
+                    
+                    // Логируем каждую организацию для отладки
+                    this.organizations.forEach((org, index) => {
+                        console.log(`  [${index+1}] Организация:`, {
+                            name: org.name,
+                            yandex_id: org.yandex_id,
+                            full_address: org.full_address,
+                            website: org.website
+                        });
+                    });
+                    
+                    this.renderTable();
+                    console.log(`🔍 updateTable возвращает: ${this.organizations.length} организаций`);
+                    
+                    // Если есть данные, показываем сообщение о завершении
+                    if (this.organizations.length > 0) {
+                        console.log('🔍 Показываем сообщение о завершении из updateTable');
+                        this.showCompletionMessage(this.organizations.length);
+                    }
+                    
+                    return this.organizations.length; // Возвращаем количество организаций
+                } catch (error) {
+                    console.error('Ошибка обновления таблицы:', error);
+                    return 0; // Возвращаем 0 при ошибке
+                }
+            }
+
+            renderTable() {
+                console.log('🎨 Рендерим таблицу с', this.organizations.length, 'организациями');
+                this.organizationsTableBody.innerHTML = '';
+                
+                this.organizations.forEach((org, index) => {
+                    console.log(`  [${index+1}] ${org.name}`);
+                    const row = document.createElement('tr');
+                    const coordinates = org.coordinates && org.coordinates.length >= 2 
+                        ? `${org.coordinates[1].toFixed(6)}, ${org.coordinates[0].toFixed(6)}`
+                        : 'Не указано';
+                    
+                    row.innerHTML = `
+                        <td>${org.name || 'Не указано'}</td>
+                        <td>${coordinates}</td>
+                        <td>${org.yandex_id || 'Не указано'}</td>
+                        <td>${org.full_address || 'Поиск...'}</td>
+                        <td>${org.website || 'Не указано'}</td>
+                        <td>${org.email || 'Поиск...'}</td>
+                        <td>${org.type || 'Не указано'}</td>
+                    `;
+                    this.organizationsTableBody.appendChild(row);
+                });
+            }
+
+
+            showStatus(message, type = 'info') {
+                const statusDiv = document.createElement('div');
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.textContent = message;
+                
+                this.statusMessages.appendChild(statusDiv);
+                
+                // Автоматически удалить сообщение через 5 секунд
+                setTimeout(() => {
+                    if (statusDiv.parentNode) {
+                        statusDiv.parentNode.removeChild(statusDiv);
+                    }
+                }, 5000);
+                
+                // Прокрутить к последнему сообщению
+                statusDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            showCompletionMessage(count) {
+                const city = this.currentCity || 'неизвестном городе';
+                const types = this.selectedTypes ? this.selectedTypes.join(', ') : 'организации';
+                
+                // Отладочная информация
+                console.log(`🔍 showCompletionMessage вызвана с count: ${count}`);
+                console.log(`🔍 this.organizations.length: ${this.organizations ? this.organizations.length : 'undefined'}`);
+                console.log(`🔍 this.organizations:`, this.organizations);
+                
+                // Используем актуальное количество из this.organizations, если count равен 0
+                const actualCount = count > 0 ? count : (this.organizations ? this.organizations.length : 0);
+                
+                this.completionMessage.innerHTML = `
+                    ✅ <strong>Поиск завершен!</strong> 
+                    Найдено <strong>${actualCount}</strong> организаций в городе <strong>${city}</strong> 
+                    (типы: <strong>${types}</strong>)
+                `;
+                
+                this.completionSection.classList.remove('hidden');
+                console.log(`✅ Показано сообщение о завершении: найдено ${actualCount} организаций`);
+            }
+
+            hideCompletionMessage() {
+                this.completionSection.classList.add('hidden');
+                console.log('❌ Скрыто сообщение о завершении');
+            }
+
+            async exportToExcel() {
+                try {
+                    console.log('📊 Запуск экспорта в Excel...');
+                    this.showStatus('📊 Подготовка файла Excel...', 'info');
+                    
+                    // Отключаем кнопку экспорта на время загрузки
+                    this.exportExcelBtn.disabled = true;
+                    this.exportExcelBtn.textContent = '⏳ Экспорт...';
+                    
+                    // Получаем название города из поля ввода
+                    const cityName = this.cityInput.value.trim();
+                    console.log('🏙️ Название города из поля ввода:', cityName);
+                    
+                    const response = await fetch(`/api/export_excel?city=${encodeURIComponent(cityName)}`);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Ошибка при экспорте');
+                    }
+                    
+                    // Получаем файл
+                    const blob = await response.blob();
+                    
+                    // Создаем ссылку для скачивания
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    // Используем имя файла на основе города
+                    let filename = `${cityName.toLowerCase().replace(/[^a-zа-я0-9]/g, '_')}.xlsx`;
+                    console.log('📁 Имя файла на основе города:', filename);
+                    
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    console.log('✅ Excel файл успешно скачан:', filename);
+                    this.showStatus(`✅ Файл ${filename} успешно скачан!`, 'success');
+                    
+                } catch (error) {
+                    console.error('❌ Ошибка при экспорте:', error);
+                    this.showStatus(`❌ Ошибка при экспорте: ${error.message}`, 'error');
+                } finally {
+                    // Восстанавливаем кнопку экспорта
+                    this.exportExcelBtn.disabled = false;
+                    this.exportExcelBtn.textContent = '📊 Экспорт в Excel';
+                }
+            }
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            new ResortSearchApp();
+        });
+    </script>
+</body>
+</html>

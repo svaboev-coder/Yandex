@@ -1,0 +1,9 @@
+# Файлы, которые Cursor должен игнорировать
+node_modules/
+.git/
+*.log
+*.tmp
+*.cache
+
+# НЕ игнорируем .env файл
+# .env
