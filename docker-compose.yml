@@ -1,8 +1,8 @@
 services:
-  yandex-search-app:
+  # Backend API сервис
+  backend:
     build: .
-    ports:
-      - "5000:5000"
+    container_name: yandex-search-backend
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
@@ -20,14 +20,27 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - yandex-network
 
-  # Опциональный nginx для статических файлов (если нужно)
-  nginx:
-    image: nginx:alpine
+  # Frontend сервис
+  frontend:
+    build: ./frontend
+    container_name: yandex-search-frontend
     ports:
       - "80:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html:ro
     depends_on:
-      - yandex-search-app
+      - backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - yandex-network
+
+networks:
+  yandex-network:
+    driver: bridge

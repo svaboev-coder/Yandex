@@ -675,7 +675,7 @@
                 console.log('🔄 Начинаем отправку запроса на поиск...');
                 try {
                     console.log('📤 Отправляем запрос на поиск:', { city: city, types: selectedTypes });
-                    const response = await fetch('http://localhost:5000/api/search_organizations', {
+                    const response = await fetch('/api/search_organizations', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -739,7 +739,7 @@
                 
                 try {
                     console.log('Отправляем повторный запрос на поиск организаций...');
-                    const response = await fetch('http://localhost:5000/api/search_organizations', {
+                    const response = await fetch('/api/search_organizations', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -795,7 +795,7 @@
                 this.showStatus('Поиск email адресов запущен...', 'info');
                 
                 try {
-                    const response = await fetch('http://localhost:5000/api/search_emails', {
+                    const response = await fetch('/api/search_emails', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -859,7 +859,7 @@
                 console.log(`🛑 Останавливаем процесс: ${processType}`);
                 
                 try {
-                    const response = await fetch('http://localhost:5000/api/stop_process', {
+                    const response = await fetch('/api/stop_process', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -913,7 +913,7 @@
             async updateTable(retryCount = 0) {
                 try {
                     console.log(`🔄 Обновляем таблицу... (попытка ${retryCount + 1})`);
-                    const response = await fetch('http://localhost:5000/api/get_organizations');
+                    const response = await fetch('/api/get_organizations');
                     console.log('📡 Статус ответа:', response.status);
                     console.log('📡 Заголовки ответа:', response.headers);
                     const data = await response.json();
@@ -1051,7 +1051,7 @@
                     const cityName = this.cityInput.value.trim();
                     console.log('🏙️ Название города из поля ввода:', cityName);
                     
-                    const response = await fetch(`http://localhost:5000/api/export_excel?city=${encodeURIComponent(cityName)}`);
+                    const response = await fetch(`/api/export_excel?city=${encodeURIComponent(cityName)}`);
                     
                     if (!response.ok) {
                         const errorData = await response.json();
