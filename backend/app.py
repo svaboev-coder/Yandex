@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
 import os
@@ -143,6 +143,8 @@ class YandexSearchAPI:
                 
             query = f"{org_type} {city}"
             print(f"Формируем запрос: '{query}'")
+            print(f"🔍 Тип организации: '{org_type}'")
+            print(f"🔍 Город: '{city}'")
             params = {
                 'text': query,
                 'type': 'biz',
@@ -233,7 +235,17 @@ class YandexSearchAPI:
             print("-" * 50)
         
         print(f"Всего найдено организаций: {len(results)}")
-        return {'organizations': results}
+        
+        # Фильтруем результаты по выбранным типам (как в тестовых данных)
+        print(f"🔍 До фильтрации: {len(results)} организаций")
+        print(f"🔍 Выбранные типы: {selected_types}")
+        for i, org in enumerate(results[:5]):  # Показываем первые 5
+            print(f"  [{i+1}] {org.get('name', 'Без названия')} - Тип: '{org.get('type', 'Нет')}'")
+        
+        filtered_results = [org for org in results if org['type'] in selected_types]
+        print(f"🔍 После фильтрации по типам: {len(filtered_results)} организаций")
+        
+        return {'organizations': filtered_results}
     
     def get_organization_details_by_coordinates(self, lon, lat, stop_flag):
         """Получение детальной информации об организации по координатам"""
@@ -427,22 +439,27 @@ class ProxyAPIClient:
 yandex_api = YandexSearchAPI()
 proxy_api = ProxyAPIClient()
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Главная страница теперь обслуживается фронтендом
 
 @app.route('/api/search_organizations', methods=['POST'])
 def search_organizations():
     global organizations_data, current_processes
     
+    print(f"🚀 Получен запрос на поиск организаций")
     data = request.json
     city = data.get('city', '').strip()
     selected_types = data.get('types', [])
     
+    print(f"🏙️ Город: '{city}'")
+    print(f"📋 Выбранные типы: {selected_types}")
+    print(f"📊 Количество типов: {len(selected_types)}")
+    
     if not city:
+        print("❌ Ошибка: Город не указан")
         return jsonify({'error': 'Город не указан'}), 400
     
     if not selected_types:
+        print("❌ Ошибка: Не выбраны типы организаций")
         return jsonify({'error': 'Не выбраны типы организаций'}), 400
     
     # Сброс данных при каждом поиске
