@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  yandex-search-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Монтируем .env файл для переменных окружения
+      - ./.env:/app/.env:ro
+      # Монтируем директорию для экспорта Excel файлов
+      - ./exports:/app/exports
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/get_status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Опциональный nginx для статических файлов (если нужно)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - yandex-search-app
+    restart: unless-stopped
