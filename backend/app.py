@@ -68,6 +68,7 @@ class YandexSearchAPI:
         # ПРИМЕЧАНИЕ: Файл .env существует в проекте и содержит актуальные ключи API
         self.api_key = os.getenv('YANDEX_SEARCH__API_KEY')
         self.base_url = 'https://search-maps.yandex.ru/v1/'
+        
     
     def search_organizations(self, city, selected_types, stop_flag):
         """Поиск курортных организаций в заданном городе"""
@@ -91,6 +92,7 @@ class YandexSearchAPI:
             
             # Создаем тестовые данные только для выбранных типов
             all_test_organizations = [
+                # Гостиницы
                 {
                     'name': f'Гостиница "Морская" в {city}',
                     'coordinates': [39.7233, 43.5855],  # Примерные координаты Сочи
@@ -102,6 +104,27 @@ class YandexSearchAPI:
                     'city': city
                 },
                 {
+                    'name': f'Гостиница "Приморская" в {city}',
+                    'coordinates': [39.7240, 43.5860],
+                    'yandex_id': 'test_id_7',
+                    'full_address': f'ул. Приморская, 25, {city}, Россия',
+                    'website': 'https://primorskaya-hotel.ru',
+                    'email': '',
+                    'type': 'гостиница',
+                    'city': city
+                },
+                {
+                    'name': f'Гостиница "Волна" в {city}',
+                    'coordinates': [39.7225, 43.5850],
+                    'yandex_id': 'test_id_8',
+                    'full_address': f'ул. Волновая, 12, {city}, Россия',
+                    'website': 'https://volna-hotel.ru',
+                    'email': '',
+                    'type': 'гостиница',
+                    'city': city
+                },
+                # Базы отдыха
+                {
                     'name': f'База отдыха "Солнечная" в {city}',
                     'coordinates': [39.7233, 43.5855],
                     'yandex_id': 'test_id_2',
@@ -111,6 +134,27 @@ class YandexSearchAPI:
                     'type': 'база отдыха',
                     'city': city
                 },
+                {
+                    'name': f'База отдыха "Лесная" в {city}',
+                    'coordinates': [39.7245, 43.5870],
+                    'yandex_id': 'test_id_9',
+                    'full_address': f'ул. Лесная, 8, {city}, Россия',
+                    'website': 'https://lesnaya-base.ru',
+                    'email': '',
+                    'type': 'база отдыха',
+                    'city': city
+                },
+                {
+                    'name': f'База отдыха "Горная" в {city}',
+                    'coordinates': [39.7220, 43.5840],
+                    'yandex_id': 'test_id_10',
+                    'full_address': f'ул. Горная, 33, {city}, Россия',
+                    'website': 'https://gornaya-base.ru',
+                    'email': '',
+                    'type': 'база отдыха',
+                    'city': city
+                },
+                # Санатории
                 {
                     'name': f'Санаторий "Здоровье" в {city}',
                     'coordinates': [39.7233, 43.5855],
@@ -122,6 +166,27 @@ class YandexSearchAPI:
                     'city': city
                 },
                 {
+                    'name': f'Санаторий "Морской" в {city}',
+                    'coordinates': [39.7250, 43.5865],
+                    'yandex_id': 'test_id_11',
+                    'full_address': f'ул. Морская, 45, {city}, Россия',
+                    'website': 'https://morskoy-sanatorium.ru',
+                    'email': '',
+                    'type': 'санаторий',
+                    'city': city
+                },
+                {
+                    'name': f'Санаторий "Лесной" в {city}',
+                    'coordinates': [39.7215, 43.5845],
+                    'yandex_id': 'test_id_12',
+                    'full_address': f'ул. Лесная, 67, {city}, Россия',
+                    'website': 'https://lesnoy-sanatorium.ru',
+                    'email': '',
+                    'type': 'санаторий',
+                    'city': city
+                },
+                # Гостевые дома
+                {
                     'name': f'Гостевой дом "Уютный" в {city}',
                     'coordinates': [39.7233, 43.5855],
                     'yandex_id': 'test_id_4',
@@ -131,6 +196,27 @@ class YandexSearchAPI:
                     'type': 'гостевой дом',
                     'city': city
                 },
+                {
+                    'name': f'Гостевой дом "Семейный" в {city}',
+                    'coordinates': [39.7240, 43.5860],
+                    'yandex_id': 'test_id_13',
+                    'full_address': f'ул. Семейная, 22, {city}, Россия',
+                    'website': 'https://semeyny-guesthouse.ru',
+                    'email': '',
+                    'type': 'гостевой дом',
+                    'city': city
+                },
+                {
+                    'name': f'Гостевой дом "Домашний" в {city}',
+                    'coordinates': [39.7225, 43.5850],
+                    'yandex_id': 'test_id_14',
+                    'full_address': f'ул. Домашняя, 18, {city}, Россия',
+                    'website': 'https://domashny-guesthouse.ru',
+                    'email': '',
+                    'type': 'гостевой дом',
+                    'city': city
+                },
+                # Хостелы
                 {
                     'name': f'Хостел "Молодежный" в {city}',
                     'coordinates': [39.7233, 43.5855],
@@ -142,11 +228,52 @@ class YandexSearchAPI:
                     'city': city
                 },
                 {
+                    'name': f'Хостел "Центральный" в {city}',
+                    'coordinates': [39.7245, 43.5870],
+                    'yandex_id': 'test_id_15',
+                    'full_address': f'ул. Центральная, 14, {city}, Россия',
+                    'website': 'https://centralny-hostel.ru',
+                    'email': '',
+                    'type': 'хостел',
+                    'city': city
+                },
+                {
+                    'name': f'Хостел "Эконом" в {city}',
+                    'coordinates': [39.7220, 43.5840],
+                    'yandex_id': 'test_id_16',
+                    'full_address': f'ул. Экономная, 7, {city}, Россия',
+                    'website': 'https://ekonom-hostel.ru',
+                    'email': '',
+                    'type': 'хостел',
+                    'city': city
+                },
+                # Дома отдыха
+                {
                     'name': f'Дом отдыха "Лесная поляна" в {city}',
                     'coordinates': [39.7233, 43.5855],
                     'yandex_id': 'test_id_6',
                     'full_address': f'ул. Лесная, 30, {city}, Россия',
                     'website': 'https://lesnaya-polyana.ru',
+                    'email': '',
+                    'type': 'дом отдыха',
+                    'city': city
+                },
+                {
+                    'name': f'Дом отдыха "Морской берег" в {city}',
+                    'coordinates': [39.7250, 43.5865],
+                    'yandex_id': 'test_id_17',
+                    'full_address': f'ул. Морская, 55, {city}, Россия',
+                    'website': 'https://morskoy-bereg.ru',
+                    'email': '',
+                    'type': 'дом отдыха',
+                    'city': city
+                },
+                {
+                    'name': f'Дом отдыха "Горный воздух" в {city}',
+                    'coordinates': [39.7215, 43.5845],
+                    'yandex_id': 'test_id_18',
+                    'full_address': f'ул. Горная, 88, {city}, Россия',
+                    'website': 'https://gorny-vozduh.ru',
                     'email': '',
                     'type': 'дом отдыха',
                     'city': city
