@@ -1,7 +1,7 @@
-# Используем официальный Python образ
+# Development Dockerfile с Flask development сервером
+
 FROM python:3.11-slim
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем файлы зависимостей
@@ -22,17 +22,15 @@ RUN mkdir -p /app/logs
 # Открываем порт 5000
 EXPOSE 5000
 
-# Устанавливаем переменные окружения
+# Устанавливаем переменные окружения для development
 ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
+ENV FLASK_ENV=development
 ENV PYTHONUNBUFFERED=1
-ENV GUNICORN_WORKERS=4
-ENV GUNICORN_TIMEOUT=120
 
 # Создаем пользователя для безопасности
 RUN adduser --disabled-password --gecos '' appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
-# Команда запуска с Gunicorn (production сервер)
-CMD ["gunicorn", "--config", "gunicorn.conf.py", "app:app"]
+# Команда запуска с Flask development сервером
+CMD ["python", "app.py"]

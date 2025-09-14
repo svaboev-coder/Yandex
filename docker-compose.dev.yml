@@ -1,18 +1,20 @@
 services:
-  yandex-search-app:
-    build: .
+  yandex-search-app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
-      - GUNICORN_WORKERS=4
-      - GUNICORN_TIMEOUT=120
     volumes:
       # Монтируем .env файл для переменных окружения
       - ./.env:/app/.env:ro
       # Монтируем директорию для экспорта Excel файлов
       - ./exports:/app/exports
+      # Hot reload для development
+      - ./backend:/app
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/get_status"]
@@ -21,7 +23,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # Опциональный nginx для статических файлов (если нужно)
+  # Опциональный nginx для статических файлов
   nginx:
     image: nginx:alpine
     ports:
@@ -29,5 +31,5 @@ services:
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     depends_on:
-      - yandex-search-app
+      - yandex-search-app-dev
     restart: unless-stopped
