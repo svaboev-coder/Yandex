@@ -913,7 +913,8 @@
             async updateTable(retryCount = 0) {
                 try {
                     console.log(`🔄 Обновляем таблицу... (попытка ${retryCount + 1})`);
-                    const response = await fetch('/api/get_organizations');
+                    const cityName = this.cityInput.value.trim();
+                    const response = await fetch(`/api/get_organizations?city=${encodeURIComponent(cityName)}`);
                     console.log('📡 Статус ответа:', response.status);
                     console.log('📡 Заголовки ответа:', response.headers);
                     const data = await response.json();

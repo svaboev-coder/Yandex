@@ -9,6 +9,7 @@ import time
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
+import pickle
 from datetime import datetime
 
 # Загружаем переменные окружения
@@ -25,6 +26,42 @@ current_processes = {
 }
 
 organizations_data = []
+
+# Функции для работы с файловым хранилищем
+def save_organizations_data(data, city):
+    """Сохраняет данные организаций в файл"""
+    try:
+        filename = f"data_{city.replace(' ', '_')}.pkl"
+        filepath = os.path.join('exports', filename)
+        
+        # Создаем директорию если не существует
+        os.makedirs('exports', exist_ok=True)
+        
+        with open(filepath, 'wb') as f:
+            pickle.dump(data, f)
+        print(f"💾 Данные сохранены в файл: {filepath}")
+        return filepath
+    except Exception as e:
+        print(f"❌ Ошибка сохранения данных: {e}")
+        return None
+
+def load_organizations_data(city):
+    """Загружает данные организаций из файла"""
+    try:
+        filename = f"data_{city.replace(' ', '_')}.pkl"
+        filepath = os.path.join('exports', filename)
+        
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                data = pickle.load(f)
+            print(f"📂 Данные загружены из файла: {filepath}, количество: {len(data)}")
+            return data
+        else:
+            print(f"📂 Файл не найден: {filepath}")
+            return []
+    except Exception as e:
+        print(f"❌ Ошибка загрузки данных: {e}")
+        return []
 
 class YandexSearchAPI:
     def __init__(self):
@@ -484,6 +521,9 @@ def search_organizations():
                 print(f"✅ Поиск завершен. Найдено {len(organizations_data)} организаций")
                 print(f"📊 Данные сохранены в organizations_data: {len(organizations_data)} элементов")
                 print(f"🔍 Проверка: organizations_data содержит {len(organizations_data)} элементов")
+                
+                # Сохраняем данные в файл для экспорта
+                save_organizations_data(organizations_data, city)
             else:
                 print(f"❌ Ошибка поиска: {result['error']}")
                 
@@ -502,6 +542,13 @@ def search_organizations():
 @app.route('/api/search_emails', methods=['POST'])
 def search_emails():
     global organizations_data, current_processes
+    
+    # Получаем город из запроса для загрузки данных
+    data = request.json
+    city = data.get('city', '').strip()
+    
+    # Загружаем данные из файла
+    organizations_data = load_organizations_data(city)
     
     if not organizations_data:
         return jsonify({'error': 'Сначала найдите организации'}), 400
@@ -535,22 +582,30 @@ def search_emails():
 
 @app.route('/api/get_organizations', methods=['GET'])
 def get_organizations():
-    print(f"📤 Запрос на получение организаций. В памяти: {len(organizations_data)} организаций")
-    print(f"📊 Текущие процессы: {current_processes}")
-    print(f"🔍 ID объекта organizations_data: {id(organizations_data)}")
-    print(f"🔍 Тип organizations_data: {type(organizations_data)}")
-    print(f"🔍 organizations_data: {organizations_data}")
+    # Получаем город из параметра запроса
+    city = request.args.get('city', '').strip()
     
-    if organizations_data:
-        print(f"📤 Отправляем {len(organizations_data)} организаций")
-        for i, org in enumerate(organizations_data[:5]):  # Показываем только первые 5 для краткости
-            print(f"  [{i+1}] {org.get('name', 'Без названия')} - ID: {org.get('yandex_id', 'Нет')} - Тип: {org.get('type', 'Нет')}")
-        if len(organizations_data) > 5:
-            print(f"  ... и еще {len(organizations_data) - 5} организаций")
+    if city:
+        # Загружаем данные из файла
+        data_to_return = load_organizations_data(city)
+        print(f"📤 Запрос на получение организаций для города '{city}'. Загружено: {len(data_to_return)} организаций")
     else:
-        print("⚠️ organizations_data пустой!")
+        # Если город не указан, возвращаем пустой список
+        data_to_return = []
+        print(f"📤 Запрос на получение организаций без указания города. Возвращаем пустой список.")
+    
+    print(f"📊 Текущие процессы: {current_processes}")
+    
+    if data_to_return:
+        print(f"📤 Отправляем {len(data_to_return)} организаций")
+        for i, org in enumerate(data_to_return[:5]):  # Показываем только первые 5 для краткости
+            print(f"  [{i+1}] {org.get('name', 'Без названия')} - ID: {org.get('yandex_id', 'Нет')} - Тип: {org.get('type', 'Нет')}")
+        if len(data_to_return) > 5:
+            print(f"  ... и еще {len(data_to_return) - 5} организаций")
+    else:
+        print("⚠️ Данные не найдены!")
         
-    return jsonify({'organizations': organizations_data})
+    return jsonify({'organizations': data_to_return})
 
 @app.route('/api/stop_process', methods=['POST'])
 def stop_process():
@@ -577,9 +632,12 @@ def export_excel():
     try:
         # Получаем название города из параметра запроса
         city_name = request.args.get('city', '').strip()
-        print(f"📊 Запрос на экспорт Excel. Город: '{city_name}', Найдено организаций: {len(organizations_data)}")
         
-        if not organizations_data:
+        # Загружаем данные из файла
+        data_to_export = load_organizations_data(city_name)
+        print(f"📊 Запрос на экспорт Excel. Город: '{city_name}', Найдено организаций: {len(data_to_export)}")
+        
+        if not data_to_export:
             return jsonify({'error': 'Нет данных для экспорта'}), 400
         
         if not city_name:
@@ -615,7 +673,7 @@ def export_excel():
             cell.alignment = header_alignment
         
         # Записываем данные
-        for row, org in enumerate(organizations_data, 2):
+        for row, org in enumerate(data_to_export, 2):
             # Форматируем координаты
             coords = org.get('coordinates', [])
             coords_str = f"{coords[1]:.6f}, {coords[0]:.6f}" if len(coords) >= 2 else ""
