@@ -1000,11 +1000,13 @@
                 
                 if (!this.cityModal) {
                     console.error('❌ cityModal элемент не найден!');
+                    console.error('❌ Проверяем document.getElementById("cityModal"):', document.getElementById('cityModal'));
                     return;
                 }
                 
                 if (!this.citiesList) {
                     console.error('❌ citiesList элемент не найден!');
+                    console.error('❌ Проверяем document.getElementById("citiesList"):', document.getElementById('citiesList'));
                     return;
                 }
                 
@@ -1045,6 +1047,20 @@
                     opacity: this.cityModal.style.opacity,
                     zIndex: this.cityModal.style.zIndex
                 });
+                
+                // Дополнительная проверка
+                console.log('🔍 Проверяем computed styles:', {
+                    display: window.getComputedStyle(this.cityModal).display,
+                    visibility: window.getComputedStyle(this.cityModal).visibility,
+                    opacity: window.getComputedStyle(this.cityModal).opacity,
+                    zIndex: window.getComputedStyle(this.cityModal).zIndex
+                });
+                
+                // Принудительно показываем модальное окно
+                this.cityModal.style.display = 'block';
+                this.cityModal.style.visibility = 'visible';
+                this.cityModal.style.opacity = '1';
+                this.cityModal.style.zIndex = '1000';
             }
 
             handleCityClick(e) {
