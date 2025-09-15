@@ -256,7 +256,50 @@ class YandexSearchAPI:
         filtered_results = [org for org in results if org['type'] in selected_types]
         print(f"🔍 После фильтрации по типам: {len(filtered_results)} организаций")
         
-        return {'organizations': filtered_results}
+        # Удаляем дубликаты по адресу и сайту
+        deduplicated_results = self.remove_duplicates(filtered_results)
+        print(f"🔍 После удаления дубликатов: {len(deduplicated_results)} организаций")
+        
+        return {'organizations': deduplicated_results}
+    
+    def remove_duplicates(self, organizations):
+        """Удаляет дубликаты организаций по адресу и сайту"""
+        seen_addresses = set()
+        seen_websites = set()
+        unique_organizations = []
+        
+        for org in organizations:
+            # Получаем адрес и сайт
+            address = org.get('full_address', '').strip().lower()
+            website = org.get('website', '').strip().lower()
+            
+            # Создаем ключ для проверки дубликатов
+            address_key = address if address else f"no_address_{org.get('yandex_id', '')}"
+            website_key = website if website else f"no_website_{org.get('yandex_id', '')}"
+            
+            # Проверяем, не встречались ли уже такие адрес или сайт
+            is_duplicate = False
+            
+            if address and address in seen_addresses:
+                print(f"🔄 Найден дубликат по адресу: {org.get('name', 'Без названия')} - {address}")
+                is_duplicate = True
+            
+            if website and website in seen_websites:
+                print(f"🔄 Найден дубликат по сайту: {org.get('name', 'Без названия')} - {website}")
+                is_duplicate = True
+            
+            if not is_duplicate:
+                unique_organizations.append(org)
+                seen_addresses.add(address_key)
+                seen_websites.add(website_key)
+            else:
+                print(f"❌ Удален дубликат: {org.get('name', 'Без названия')}")
+        
+        removed_count = len(organizations) - len(unique_organizations)
+        if removed_count > 0:
+            print(f"🧹 Удалено дубликатов: {removed_count}")
+        
+        return unique_organizations
     
     def get_organization_details_by_coordinates(self, lon, lat, stop_flag):
         """Получение детальной информации об организации по координатам"""
