@@ -719,7 +719,7 @@
                 <button class="modal-close" id="cityModalClose">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 15px; color: #6c757d;">Найдено несколько городов с таким названием. Выберите нужный:</p>
+                <p style="margin-bottom: 15px; color: #6c757d;">Найдены города с таким названием. Выберите нужный:</p>
                 <div class="cities-list" id="citiesList">
                     <!-- Список городов будет добавлен динамически -->
                 </div>
@@ -971,17 +971,8 @@
                         return;
                     }
 
-                    if (cities.length === 1) {
-                        // Если найден только один город, сразу переходим к выбору радиуса
-                        this.selectedCity = cities[0];
-                        this.selectedCityName = cities[0].name; // Сохраняем название города
-                        this.selectedCoordinates = cities[0].coordinates;
-                        console.log('✅ Выбран единственный город:', this.selectedCity);
-                        this.showRadiusModal();
-                    } else {
-                        // Если найдено несколько городов, показываем модальное окно выбора
-                        this.showCityModal(cities);
-                    }
+                    // Всегда показываем модальное окно выбора города
+                    this.showCityModal(cities);
 
                 } catch (error) {
                     console.error('❌ Ошибка в handleSearch:', error);
