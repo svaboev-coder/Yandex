@@ -927,16 +927,7 @@
                     return;
                 }
 
-                // Собираем выбранные типы организаций
-                const selectedTypes = this.getSelectedOrganizationTypes();
-                console.log('📋 Выбранные типы:', selectedTypes);
-                if (selectedTypes.length === 0) {
-                    this.showStatus('Выберите хотя бы один тип организации', 'error');
-                    return;
-                }
-
-                // Сохраняем типы для последующих запросов
-                this.selectedTypes = selectedTypes;
+                // Сохраняем город для последующих запросов
                 this.currentCity = city;
 
                 this.showStatus(`Поиск городов с названием: ${city}`, 'info');
@@ -994,16 +985,7 @@
                     return;
                 }
 
-                // Проверяем выбранные типы организаций
-                const selectedTypes = this.getSelectedOrganizationTypes();
-                console.log('📋 Выбранные типы:', selectedTypes);
-                if (selectedTypes.length === 0) {
-                    this.showStatus('❌ Выберите хотя бы один тип организации', 'error');
-                    return;
-                }
-
-                // Сохраняем типы для последующих запросов
-                this.selectedTypes = selectedTypes;
+                // Типы организаций будут считаны перед началом поиска
 
                 console.log('✅ Переходим к выбору радиуса для города:', this.selectedCity.name);
                 this.showRadiusModal();
@@ -1154,6 +1136,17 @@
                 console.log('🚀 Запуск поиска организаций по координатам');
                 console.log('📍 Координаты:', this.selectedCoordinates);
                 console.log('📏 Радиус:', this.selectedRadius);
+                
+                // Собираем выбранные типы организаций перед началом поиска
+                const selectedTypes = this.getSelectedOrganizationTypes();
+                console.log('📋 Выбранные типы:', selectedTypes);
+                if (selectedTypes.length === 0) {
+                    this.showStatus('Выберите хотя бы один тип организации', 'error');
+                    return;
+                }
+
+                // Сохраняем типы для последующих запросов
+                this.selectedTypes = selectedTypes;
                 console.log('📋 Типы:', this.selectedTypes);
                 
                 this.showStatus(`Поиск организаций по координатам ${this.selectedCoordinates[1].toFixed(4)}, ${this.selectedCoordinates[0].toFixed(4)}, радиус ${this.selectedRadius} км`, 'info');
@@ -1224,6 +1217,17 @@
                     this.showStatus('Сначала введите город и нажмите "Найти организации"', 'error');
                     return;
                 }
+
+                // Собираем выбранные типы организаций перед началом поиска
+                const selectedTypes = this.getSelectedOrganizationTypes();
+                console.log('📋 Выбранные типы:', selectedTypes);
+                if (selectedTypes.length === 0) {
+                    this.showStatus('Выберите хотя бы один тип организации', 'error');
+                    return;
+                }
+
+                // Сохраняем типы для последующих запросов
+                this.selectedTypes = selectedTypes;
 
                 console.log(`🚀 Повторный поиск названий для города: ${this.currentCity}`);
                 this.currentProcess = 'search_names';
