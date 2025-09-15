@@ -972,6 +972,7 @@
                     }
 
                     // Всегда показываем модальное окно выбора города
+                    console.log('🔍 Вызываем showCityModal с городами:', cities);
                     this.showCityModal(cities);
 
                 } catch (error) {
@@ -1011,6 +1012,20 @@
             // Методы для работы с модальными окнами
             showCityModal(cities) {
                 console.log('🏙️ Показываем модальное окно выбора города');
+                console.log('🔍 Количество городов:', cities.length);
+                console.log('🔍 cityModal элемент:', this.cityModal);
+                console.log('🔍 citiesList элемент:', this.citiesList);
+                
+                if (!this.cityModal) {
+                    console.error('❌ cityModal элемент не найден!');
+                    return;
+                }
+                
+                if (!this.citiesList) {
+                    console.error('❌ citiesList элемент не найден!');
+                    return;
+                }
+                
                 this.citiesList.innerHTML = '';
                 
                 cities.forEach((city, index) => {
@@ -1033,9 +1048,21 @@
                     this.citiesList.appendChild(cityItem);
                 });
                 
+                console.log('🔍 Устанавливаем display: block для модального окна');
                 this.cityModal.style.display = 'block';
+                this.cityModal.style.visibility = 'visible';
+                this.cityModal.style.opacity = '1';
+                this.cityModal.style.zIndex = '1000';
                 this.selectedCity = null;
                 this.cityModalConfirm.disabled = true;
+                
+                console.log('✅ Модальное окно должно быть видимо');
+                console.log('🔍 Проверяем стили модального окна:', {
+                    display: this.cityModal.style.display,
+                    visibility: this.cityModal.style.visibility,
+                    opacity: this.cityModal.style.opacity,
+                    zIndex: this.cityModal.style.zIndex
+                });
             }
 
             handleCityClick(e) {
