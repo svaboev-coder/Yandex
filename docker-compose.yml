@@ -25,7 +25,9 @@ services:
 
   # Frontend сервис
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: yandex-search-frontend
     ports:
       - "80:80"

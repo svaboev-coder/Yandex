@@ -3,7 +3,7 @@
 FROM nginx:alpine
 
 # Копируем статические файлы
-COPY index.html /usr/share/nginx/html/
+COPY backend/templates/index.html /usr/share/nginx/html/
 
 # Создаем конфигурацию Nginx
 RUN echo 'server { \
