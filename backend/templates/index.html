@@ -482,6 +482,21 @@
             background-color: #f8f9fa;
             border-left: 4px solid #4facfe;
         }
+        
+        /* Стили для веб-сайтов */
+        .real-website a {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+        
+        .no-website {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .real-website {
+            color: #0066cc;
+        }
 
         .city-item.selected {
             background-color: #e3f2fd;
@@ -1515,7 +1530,9 @@
                         <td>${coordinates}</td>
                         <td>${org.yandex_id || 'Не указано'}</td>
                         <td>${org.full_address || 'Поиск...'}</td>
-                        <td>${org.website || 'Не указано'}</td>
+                        <td class="${org.website ? 'real-website' : 'no-website'}">
+                            ${org.website ? `<a href="${org.website}" target="_blank" rel="noopener noreferrer">${org.website}</a>` : 'Сайт не найден'}
+                        </td>
                         <td>${org.email || 'Поиск...'}</td>
                         <td>${org.type || 'Не указано'}</td>
                     `;
